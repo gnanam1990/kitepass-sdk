@@ -1,13 +1,17 @@
 # KitePass SDK
 
-> TypeScript SDK for adding Kite Agent Passport authentication and x402 payments to any web service.
+> Drop-in TypeScript SDK for adding Kite Agent Passport auth and x402 payments to any service.
 
 ## Packages
 
 | Package | Description |
 |---|---|
-| `@kitepass/sdk-core` | Framework-agnostic core with session verification, spend tracking, rate limiting |
-| `@kitepass/sdk-express` | Express middleware wrapping core |
+| `@kitepass/sdk-core` | Framework-agnostic core with session verification, spend tracking, rate limiting, webhooks, policies |
+| `@kitepass/sdk-express` | Express middleware |
+| `@kitepass/sdk-hono` | Hono middleware |
+| `@kitepass/sdk-fastify` | Fastify plugin |
+| `@kitepass/sdk-next` | Next.js middleware + helpers |
+| `@kitepass/sdk-mcp` | MCP server payment gate |
 
 ## Quick start
 
@@ -32,22 +36,46 @@ app.get("/api/data", async (req, res) => {
 });
 ```
 
-## Core API
+## Features
+
+- **Session verification** — Verify agent sessions via Kite Passport
+- **Spend tracking** — Reserve, commit, refund payments with in-memory or Redis backend
+- **Rate limiting** — Token bucket rate limiting per session
+- **Spending policies** — JSON-based rules for max per tx, per window, category whitelist, time windows
+- **Webhooks** — HMAC-signed webhook events for payment and session events
+- **Cost headers** — Automatic X-Kite-* headers on responses
+
+## Spending Policy DSL
 
 ```typescript
-import { KitePass } from "@kitepass/sdk-core";
+import { PolicyEngine } from "@kitepass/sdk-core";
 
-const kp = new KitePass({
-  serviceAddress: "0x...",
-  pricePerCall: "0.001",
+const policy = new PolicyEngine({
+  rules: [
+    { type: "max_per_tx", max: "0.01" },
+    { type: "max_per_window", window: "1h", max: "1.00" },
+    { type: "category_whitelist", categories: ["ai", "data"] },
+  ],
+  on_violation: "block",
 });
 
-const session = await kp.verifySession(sessionId);
-const reservation = await kp.reserveSpend(sessionId, "0.001");
-// ... do work ...
-await kp.commitSpend(reservation);
-// or on error:
-await kp.refundSpend(reservation);
+const result = policy.check(amount, { category: "ai", sessionSpent, sessionReserved });
+if (!result.allowed) {
+  // Block the request
+}
+```
+
+## Webhook Verification
+
+```typescript
+import { WebhookDispatcher } from "@kitepass/sdk-core";
+
+// Verify incoming webhook signature
+const isValid = WebhookDispatcher.verifySignature(
+  requestBody,
+  request.headers["x-kitepass-signature"],
+  webhookSecret,
+);
 ```
 
 ## Development
