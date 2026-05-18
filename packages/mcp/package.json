@@ -1,0 +1,16 @@
+{
+  "name": "@kitepass/sdk-mcp",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "scripts": { "build": "tsup" },
+  "dependencies": { "@kitepass/sdk-core": "workspace:*" },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0"
+  },
+  "license": "MIT"
+}
