@@ -1,0 +1,29 @@
+{
+  "name": "@kitepass/sdk-express",
+  "version": "0.1.0-alpha.1",
+  "description": "Express middleware for Kite Agent Passport authentication and x402 payments",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@kitepass/sdk-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0",
+    "@types/express": "^4.17.0"
+  },
+  "license": "MIT"
+}

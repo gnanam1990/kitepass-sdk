@@ -1,0 +1,13 @@
+{
+  "name": "kitepass-sdk-monorepo",
+  "private": true,
+  "workspaces": ["packages/*", "examples/*"],
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "dev": "pnpm -r dev"
+  },
+  "engines": { "node": ">=18.0.0" },
+  "license": "MIT"
+}
