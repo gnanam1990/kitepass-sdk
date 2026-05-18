@@ -237,3 +237,11 @@ export class KitePass {
     }
   }
 }
+
+export { RedisSpendTracker, InMemorySpendTracker } from "./spend-tracker.js";
+export type { SpendingRecord, SpendTrackerInterface } from "./spend-tracker.js";
+export { WebhookDispatcher, WEBHOOK_EVENTS } from "./webhooks.js";
+export type { WebhookConfig, WebhookPayload } from "./webhooks.js";
+export { PolicyEngine } from "./policy.js";
+export type { PolicyRule, SpendingPolicy, PolicyCheckResult } from "./policy.js";
+
