@@ -45,6 +45,13 @@ app.get("/api/data", async (req, res) => {
 - **Webhooks** — HMAC-signed webhook events for payment and session events
 - **Cost headers** — Automatic X-Kite-* headers on responses
 
+## Deployment
+
+- **Dashboard:** https://kitepass-sdk.vercel.app
+- **Host:** Vercel project `kitepass-sdk`
+- **Status:** dashboard and `/api/status` verified on 2026-05-23.
+- **Data:** analytics are disabled until `KITEPASS_SERVICES_URL`, `KITEPASS_USAGE_URL`, `KITEPASS_EVENTS_URL`, and `KITEPASS_POLICY_URL` are configured.
+
 ## Spending Policy DSL
 
 ```typescript
