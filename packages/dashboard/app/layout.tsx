@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "KitePass Dashboard",
   description: "Hosted monitoring dashboard for KitePass SDK integrations.",
+  icons: {
+    icon: "/brand/kite-logo-mark-beige.png",
+  },
 };
 
 export default function RootLayout({
@@ -15,6 +18,7 @@ export default function RootLayout({
         <div className="shell">
           <header className="topbar">
             <a className="brand" href="/">
+              <img className="brand-logo" src="/brand/kite-logo-beige.png" alt="Kite" />
               KitePass Dashboard
             </a>
             <nav className="nav" aria-label="Primary">

@@ -40,8 +40,17 @@ a {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 900;
   text-decoration: none;
+}
+
+.brand-logo {
+  width: auto;
+  height: 32px;
+  object-fit: contain;
 }
 
 .nav {
