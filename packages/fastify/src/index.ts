@@ -5,6 +5,19 @@ export interface KitePassFastifyOptions extends KitePassConfig {
   skipPaths?: string[];
 }
 
+export interface KitePassFastifyContext {
+  sessionId: string;
+  reservation: Awaited<ReturnType<KitePass["reserveSpend"]>>["reservation"];
+  commit: () => Promise<void>;
+  refund: () => Promise<void>;
+}
+
+declare module "fastify" {
+  interface FastifyRequest {
+    kitepass?: KitePassFastifyContext;
+  }
+}
+
 export async function kitepassFastify(fastify: FastifyInstance, options: KitePassFastifyOptions) {
   const kp = new KitePass(options);
   const skipPaths = new Set(options.skipPaths ?? []);
@@ -38,7 +51,7 @@ export async function kitepassFastify(fastify: FastifyInstance, options: KitePas
       return;
     }
 
-    (request as any).kitepass = {
+    request.kitepass = {
       sessionId,
       reservation: spendResult.reservation,
       commit: async () => { await kp.commitSpend(spendResult.reservation); },

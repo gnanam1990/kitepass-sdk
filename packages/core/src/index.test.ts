@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { KitePass } from "../src/index.js";
+import { PolicyEngine } from "../src/policy.js";
 
 describe("KitePass", () => {
   it("creates instance with config", () => {
@@ -27,5 +28,36 @@ describe("KitePass", () => {
     });
     const reservations = kp.getReservations();
     expect(reservations.size).toBe(0);
+  });
+});
+
+describe("PolicyEngine", () => {
+  const localTime = (hour: number, minute: number) => new Date(2026, 0, 1, hour, minute).getTime();
+
+  it("allows same-day time windows", () => {
+    const engine = new PolicyEngine({
+      rules: [{ type: "time_window", start: "09:00", end: "17:00" }],
+      on_violation: "block",
+    });
+
+    expect(engine.check(BigInt(1), { timestamp: localTime(12, 0) }).allowed).toBe(true);
+  });
+
+  it("allows overnight time windows after midnight", () => {
+    const engine = new PolicyEngine({
+      rules: [{ type: "time_window", start: "22:00", end: "02:00" }],
+      on_violation: "block",
+    });
+
+    expect(engine.check(BigInt(1), { timestamp: localTime(1, 30) }).allowed).toBe(true);
+  });
+
+  it("blocks outside overnight time windows", () => {
+    const engine = new PolicyEngine({
+      rules: [{ type: "time_window", start: "22:00", end: "02:00" }],
+      on_violation: "block",
+    });
+
+    expect(engine.check(BigInt(1), { timestamp: localTime(12, 0) }).allowed).toBe(false);
   });
 });

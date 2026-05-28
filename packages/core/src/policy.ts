@@ -84,8 +84,14 @@ export class PolicyEngine {
       case "time_window": {
         const now = context.timestamp ?? Date.now();
         const date = new Date(now);
-        const currentTime = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-        if (currentTime < rule.start || currentTime > rule.end) {
+        const currentMinute = (date.getHours() * 60) + date.getMinutes();
+        const startMinute = this.parseTimeOfDay(rule.start);
+        const endMinute = this.parseTimeOfDay(rule.end);
+        const inWindow = startMinute <= endMinute
+          ? currentMinute >= startMinute && currentMinute <= endMinute
+          : currentMinute >= startMinute || currentMinute <= endMinute;
+
+        if (!inWindow) {
           return {
             allowed: false,
             reason: `Outside allowed time window (${rule.start}-${rule.end})`,
@@ -104,5 +110,13 @@ export class PolicyEngine {
     const [whole, frac = ""] = amount.split(".");
     const padded = (whole ?? "0") + frac.padEnd(6, "0").slice(0, 6);
     return BigInt(padded);
+  }
+
+  private parseTimeOfDay(value: string): number {
+    const match = value.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+    if (!match) {
+      throw new Error(`Invalid time_window value "${value}". Expected HH:mm.`);
+    }
+    return (Number(match[1]) * 60) + Number(match[2]);
   }
 }

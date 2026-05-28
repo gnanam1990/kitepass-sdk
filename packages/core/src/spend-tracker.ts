@@ -54,7 +54,7 @@ export class RedisSpendTracker implements SpendTrackerInterface {
         "PX",
         this.ttlMs,
       )
-      .hincrby(sessKey, "reserved", Number(amount))
+      .hincrby(sessKey, "reserved", amount.toString())
       .exec();
 
     return record;
@@ -67,6 +67,7 @@ export class RedisSpendTracker implements SpendTrackerInterface {
 
     const record = JSON.parse(raw);
     if (record.status !== "reserved") return;
+    const amount = BigInt(record.amount);
 
     const sessKey = `kp:sess:${record.sessionId}`;
     await this.redis
@@ -77,8 +78,8 @@ export class RedisSpendTracker implements SpendTrackerInterface {
         "PX",
         this.ttlMs,
       )
-      .hincrby(sessKey, "reserved", -Number(record.amount))
-      .hincrby(sessKey, "spent", Number(record.amount))
+      .hincrby(sessKey, "reserved", (-amount).toString())
+      .hincrby(sessKey, "spent", amount.toString())
       .exec();
   }
 
@@ -89,6 +90,7 @@ export class RedisSpendTracker implements SpendTrackerInterface {
 
     const record = JSON.parse(raw);
     if (record.status !== "reserved") return;
+    const amount = BigInt(record.amount);
 
     const sessKey = `kp:sess:${record.sessionId}`;
     await this.redis
@@ -99,7 +101,7 @@ export class RedisSpendTracker implements SpendTrackerInterface {
         "PX",
         this.ttlMs,
       )
-      .hincrby(sessKey, "reserved", -Number(record.amount))
+      .hincrby(sessKey, "reserved", (-amount).toString())
       .exec();
   }
 
