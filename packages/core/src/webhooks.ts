@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { EventEmitter } from "node:events";
 
 export interface WebhookConfig {
@@ -56,8 +56,15 @@ export class WebhookDispatcher extends EventEmitter {
     signature: string,
     secret: string,
   ): boolean {
-    const expected = createHmac("sha256", secret).update(payload).digest("hex");
-    return signature === `sha256=${expected}`;
+    if (typeof signature !== "string") return false;
+    const expected = `sha256=${createHmac("sha256", secret).update(payload).digest("hex")}`;
+    const signatureBuf = Buffer.from(signature);
+    const expectedBuf = Buffer.from(expected);
+    // timingSafeEqual requires equal-length buffers; differing lengths mean
+    // the signature is invalid regardless. Comparing lengths first does not
+    // leak secret bytes, only the (public) expected signature length.
+    if (signatureBuf.length !== expectedBuf.length) return false;
+    return timingSafeEqual(signatureBuf, expectedBuf);
   }
 }
 
